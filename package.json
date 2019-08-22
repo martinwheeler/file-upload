@@ -1,0 +1,59 @@
+{
+  "name": "undress-plugins",
+  "version": "4.3.16",
+  "description": "Plugins for the Undress Squarespace website",
+  "main": "src/index.js",
+  "repository": "git@github.com:martinwheeler/undress-plugins.git",
+  "author": "Martin Wheeler <martin@martinwheeler.com.au>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "parcel src/index.html",
+    "prebuild": "rm -rf .cache dist",
+    "build": "parcel build src/index.tsx",
+    "test": "jest --watch",
+    "test:ci": "jest && codecov",
+    "bump": "./support/bump.sh",
+    "upload:sourcemaps": "node ./support/upload-sourcemaps.js",
+    "cache:purge": "node ./support/purge-cache.js"
+  },
+  "dependencies": {
+    "@babel/core": "^7.4.5",
+    "@babel/plugin-syntax-dynamic-import": "^7.2.0",
+    "@babel/polyfill": "^7.4.4",
+    "@babel/preset-env": "^7.4.5",
+    "@babel/preset-react": "^7.0.0",
+    "@bugsnag/js": "^6.3.2",
+    "babel-jest": "^24.8.0",
+    "bowser": "^2.4.0",
+    "bugsnag-sourcemaps": "^1.2.1",
+    "codecov": "^3.5.0",
+    "dotenv": "^8.0.0",
+    "file-saver": "^2.0.2",
+    "glamor": "https://github.com/martinwheeler/glamor.git#2.20.41",
+    "invariant": "^2.2.4",
+    "jest": "^24.8.0",
+    "jszip": "^3.2.2",
+    "jszip-utils": "^0.1.0",
+    "node-fetch": "^2.6.0",
+    "parcel-plugin-bundle-visualiser": "^1.2.0",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "validatorjs": "^3.15.1",
+    "xml2js": "^0.4.19"
+  },
+  "jest": {
+    "coverageDirectory": "./coverage/",
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "**/src/**/*.{js,jsx}",
+      "!**/node_modules/**",
+      "!**/vendor/**",
+      "!**/dist/**",
+      "!**/coverage/**"
+    ],
+    "clearMocks": true
+  },
+  "devDependencies": {
+    "typescript": "^3.5.3"
+  }
+}

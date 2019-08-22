@@ -1,0 +1,9 @@
+/node_modules/
+/coverage/
+/.cache/
+/dist/index.html
+/dist/undress*
+.env*
+!.env.example
+/dist/index.html
+/dist/undress-*

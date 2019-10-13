@@ -1,6 +1,6 @@
 import bugsnag from "@bugsnag/js";
 import { notify } from "./slack";
-import packageJson from "../../package.json";
+import { version } from "../../package.json";
 
 let bugsnagClient = {
   notify: notify
@@ -17,7 +17,7 @@ const releaseStage = stageMap[currentEnv] || stageMap.default;
 if (process.env.NODE_ENV !== "test") {
   bugsnagClient = bugsnag({
     apiKey: process.env.BUGSNAG_ID,
-    appVersion: packageJson.version,
+    appVersion: version,
     releaseStage
   });
 }

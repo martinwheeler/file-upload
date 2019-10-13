@@ -7,7 +7,7 @@ import { render } from "react-dom";
 import invariant from "invariant";
 
 import { getFormElements, checkForms } from "./utils/styling";
-import packageJson from "../package.json";
+import { version } from "../package.json";
 import { bugsnagClient } from "./utils/bugsnag";
 
 import developmentGlobals from "./utils/development-globals";
@@ -91,7 +91,7 @@ try {
 
   Squarespace &&
     Squarespace.onInitialize(Y, async () => {
-      console.warn(`🚀 INITIALISING FORM UPLOADER: v${packageJson.version}`);
+      console.warn(`🚀 INITIALISING FORM UPLOADER: v${version}`);
 
       if (!validBrowser || developmentGlobals.invalidBrowser) {
         // TODO: Lazy load Bowser + notify util

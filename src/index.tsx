@@ -1,16 +1,16 @@
 /* tslint:disable */
 import "@babel/polyfill";
 import "./utils/bugsnag.ts";
-import developmentGlobals from "./utils/development-globals";
-import invariant from "invariant";
-import Bowser from "bowser";
-import { render } from "react-dom";
+
 import React from "react";
+import { render } from "react-dom";
+import invariant from "invariant";
+
 import { getFormElements, checkForms } from "./utils/styling";
-import { notify } from "./utils/slack";
 import packageJson from "../package.json";
-import Uploads from "./components/uploads";
 import { bugsnagClient } from "./utils/bugsnag";
+
+import developmentGlobals from "./utils/development-globals";
 import get from "lodash/get";
 
 declare global {
@@ -53,7 +53,6 @@ try {
       }
     } catch (error) {
       bugsnagClient.notify(error);
-      console.warn(error);
       if (process.env.NODE_ENV !== "test" && developmentGlobals.autoReload) {
         topWindow.location.reload(true);
       }
@@ -95,30 +94,35 @@ try {
       console.warn(`🚀 INITIALISING FORM UPLOADER: v${packageJson.version}`);
 
       if (!validBrowser || developmentGlobals.invalidBrowser) {
-        const browserDetails = Bowser.parse(topWindow.navigator.userAgent);
-        const shortBrowserDetails = `${browserDetails.os.name}: ${
-          browserDetails.browser.name
-        } - ${browserDetails.browser.version}`;
-        const currentUrl = topWindow.location.href;
+        // TODO: Lazy load Bowser + notify util
+        const BowserUtil = import("bowser").then(Imported => {
+          const Bowser = Imported.default;
+          const browserDetails = Bowser.parse(topWindow.navigator.userAgent);
+          const shortBrowserDetails = `${browserDetails.os.name}: ${browserDetails.browser.name} - ${browserDetails.browser.version}`;
+          const currentUrl = topWindow.location.href;
 
-        const invalidBrowserMessage = {
-          username: "File Uploader",
-          attachments: [
-            {
-              fallback: `An invalid browser version has been used! They won't be able to see the upload input on new DOM nodes. On: ${shortBrowserDetails}`,
-              pretext: `An invalid browser has been detected! ${currentUrl}`,
-              color: "#D00000",
-              fields: [
-                {
-                  title: "Browser",
-                  value: JSON.stringify(browserDetails, null, 2),
-                  short: false
-                }
-              ]
-            }
-          ]
-        };
-        notify(invalidBrowserMessage);
+          const invalidBrowserMessage = {
+            username: "File Uploader",
+            attachments: [
+              {
+                fallback: `An invalid browser version has been used! They won't be able to see the upload input on new DOM nodes. On: ${shortBrowserDetails}`,
+                pretext: `An invalid browser has been detected! ${currentUrl}`,
+                color: "#D00000",
+                fields: [
+                  {
+                    title: "Browser",
+                    value: JSON.stringify(browserDetails, null, 2),
+                    short: false
+                  }
+                ]
+              }
+            ]
+          };
+
+          import("./utils/slack").then(({ notify }) => {
+            notify(invalidBrowserMessage);
+          });
+        });
       } else {
         if (!domObserver) {
           /**
@@ -205,15 +209,21 @@ try {
                     bodyContainer.style.display = "none";
                     if (!possibleDialogRoot) {
                       navDialogContainer.appendChild(newDialogRoot);
-                      // NOTE: Make sure we show old body when user navigates away from uploads section
-                      setTimeout(() =>
+
+                      // TODO: Lazy load the upload component
+                      const UploadsComponent = import(
+                        "./components/uploads"
+                      ).then(Component => {
+                        const Uploads = Component.default;
                         render(
                           <Uploads newDialog pageUrl={pageUrl} />,
                           topWindow.document.querySelector(
                             "#newUploadDialogApp"
                           )
-                        )
-                      );
+                        );
+                      });
+
+                      // NOTE: Make sure we show old body when user navigates away from uploads section
                     } else {
                       // Reshow the body element
                       possibleDialogRoot.style.display = "block";
@@ -261,7 +271,6 @@ try {
                   navMenuElement.appendChild(newNavItem);
 
                   resetAdminDialog = () => {
-                    console.warn("CLEARING UPLOAD");
                     newNavItem.remove();
                     newDialogRoot.remove();
                     if (unSubHandler) {
@@ -306,7 +315,6 @@ try {
           AdminUploadField = await import("./admin-upload-field");
         } catch (error) {
           bugsnagClient.notify(error);
-          console.warn(error);
         }
 
         AdminUploadField.initDialog();

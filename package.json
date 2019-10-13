@@ -17,17 +17,15 @@
     "cache:purge": "node ./support/purge-cache.js"
   },
   "dependencies": {
-    "@babel/core": "^7.4.5",
+    "@babel/core": "^7.6.4",
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
-    "@babel/polyfill": "^7.4.4",
-    "@babel/preset-env": "^7.4.5",
-    "@babel/preset-react": "^7.0.0",
-    "@bugsnag/js": "^6.3.2",
+    "@babel/polyfill": "^7.6.0",
+    "@babel/preset-env": "^7.6.3",
+    "@babel/preset-react": "^7.6.3",
+    "@bugsnag/js": "^6.4.2",
     "babel-jest": "^24.8.0",
     "bowser": "^2.4.0",
     "bugsnag-sourcemaps": "^1.2.1",
-    "codecov": "^3.5.0",
-    "dotenv": "^8.0.0",
     "file-saver": "^2.0.2",
     "glamor": "https://github.com/martinwheeler/glamor.git#2.20.41",
     "invariant": "^2.2.4",
@@ -38,8 +36,7 @@
     "parcel-plugin-bundle-visualiser": "^1.2.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "validatorjs": "^3.15.1",
-    "xml2js": "^0.4.19"
+    "validatorjs": "^3.15.1"
   },
   "jest": {
     "coverageDirectory": "./coverage/",
@@ -54,6 +51,10 @@
     "clearMocks": true
   },
   "devDependencies": {
-    "typescript": "^3.5.3"
+    "codecov": "^3.5.0",
+    "dotenv": "^8.0.0",
+    "parcel": "^1.12.4",
+    "typescript": "^3.5.3",
+    "xml2js": "^0.4.19"
   }
 }

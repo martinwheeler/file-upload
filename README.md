@@ -1,13 +1,4 @@
 <h1 align="center">Welcome to File Upload 👋</h1>
-<p>
-  <img src="https://img.shields.io/badge/dynamic/json.svg?color=blue&label=version&query=version&url=https%3A%2F%2Fraw.githubusercontent.com%2Fmartinwheeler%2Fundress-plugins%2Fmaster%2Fpackage.json" />
-  <a href="https://codecov.io/gh/martinwheeler/undress-plugins">
-    <img src="https://codecov.io/gh/martinwheeler/undress-plugins/branch/master/graph/badge.svg" />
-  </a>
-  <a href="https://circleci.com/gh/martinwheeler/undress-plugins" target="_blank">
-    <img src="https://circleci.com/gh/martinwheeler/undress-plugins.svg?style=svg" />
-  </a>
-</p>
 
 > A file upload plugin for Squarespace.
 

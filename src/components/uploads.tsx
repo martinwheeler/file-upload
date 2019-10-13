@@ -115,11 +115,6 @@ const newDialogHeading = css({
   fontWeight: "500"
 });
 
-const tapLog = data => {
-  console.warn("DATA: ", data);
-  return data;
-};
-
 const getBreadcrumb = ({ path, baseName }) =>
   path.replace(/\./g, "/").replace(new RegExp(`${baseName}/?`, "g"), "");
 
@@ -163,21 +158,17 @@ class Uploads extends Component<Props> {
   constructor(props) {
     super(props);
 
-    this.folderBaseName = `${Static.SQUARESPACE_CONTEXT.website.identifier}-${
-      Static.SQUARESPACE_CONTEXT.website.id
-    }`;
+    this.folderBaseName = `${Static.SQUARESPACE_CONTEXT.website.identifier}-${Static.SQUARESPACE_CONTEXT.website.id}`;
 
     this.state = {
       loading: !!props.pageUrl,
       error: props.pageUrl
         ? null
         : "Sorry, we need you to enter a URL Slug under the Basic tab before Uploads will work correctly.",
-      folderBreadcrumb: tapLog(
-        getBreadcrumb({
-          path: `${this.folderBaseName}.${props.pageUrl}`,
-          baseName: this.folderBaseName
-        })
-      ),
+      folderBreadcrumb: getBreadcrumb({
+        path: `${this.folderBaseName}.${props.pageUrl}`,
+        baseName: this.folderBaseName
+      }),
       openFolder: `${this.folderBaseName}.${props.pageUrl}`
     };
 

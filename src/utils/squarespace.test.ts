@@ -1,17 +1,5 @@
 import "./fake-squarespace";
-import { checkVersion, getDialogType, DIALOG_TYPE } from "./squarespace";
-
-describe("checkVersion", () => {
-  it("should not throw", () => {
-    expect(checkVersion).not.toThrow();
-  });
-
-  it("should send slack message", () => {
-    localStorage.setItem("squareSpaceVersion", "some-invalid-version");
-    checkVersion();
-    expect(fetch).toHaveBeenCalledTimes(1);
-  });
-});
+import { getDialogType, DIALOG_TYPE } from "./squarespace";
 
 describe("getDialogType", () => {
   it("should return an add dialog type", () => {

@@ -1,6 +1,6 @@
 import SAU from "../vendor/simple-ajax-uploader";
-import { getFormElements, checkForms, injectStyleSheet } from "./utils/styling";
-import { checkVersion, USER_ID } from "./utils/squarespace";
+import { injectStyleSheet } from "./utils/styling";
+import { USER_ID } from "./utils/squarespace";
 import validatorjs from "validatorjs";
 import get from "lodash/get";
 
@@ -28,9 +28,6 @@ class FormUploader {
       : get(window, "top.location.pathname")
     ).replace(/^\//, "");
     this.folderBaseName = `${USER_ID}/${this.pagePath}`;
-
-    // checkVersion();
-    console.log("CONSTRUCTOR");
   }
 
   resetErrorStyles({ inputNode, parentNode, hasAddedParentClass }) {
@@ -56,15 +53,12 @@ class FormUploader {
     const rules = {};
     const fields = {};
 
-    console.warn("REQUIREMENTS: ", requirements);
-
     labels.forEach(label => {
       const currentLabelText = label.innerHTML
         .replace(/\<.*\>/, "")
         .trim()
         .toLowerCase();
 
-      console.warn("LABEL: ", label, currentLabelText);
       if (currentLabelText === requirements.field.toLowerCase()) {
         const currentFor = label.getAttribute("for");
         const inputId = `#${currentFor}`;
@@ -150,7 +144,6 @@ class FormUploader {
 
     if (!validFileInput) {
       error.message = "Invalid File Input Field";
-      // console.error(error);
       return;
     }
 
@@ -158,7 +151,6 @@ class FormUploader {
 
     if (!textInput) {
       error.message = "Invalid Text Input Field";
-      // console.error(error);
       return;
     }
 
@@ -402,8 +394,6 @@ class FormUploader {
 
     const uploadInput = document.querySelector("input[type=file][name=file]");
     uploadInput.addEventListener("click", this.handleValidation);
-
-    console.warn("UPLOADER: ", uploader);
 
     return uploader;
   }

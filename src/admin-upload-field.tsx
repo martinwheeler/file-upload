@@ -41,10 +41,6 @@ function dialogInit(element) {
         bugsnagClient.notify(error);
       }
 
-      console.warn("ELEMENT: ", element);
-      console.warn("CURRENT DIALOG: ", currentDialog);
-      console.warn("AFTER RENDER");
-
       // Shows the field when adding a form field
       if (currentDialog === DIALOG_TYPE.ADD) {
         // Gets the form field options that will be shown

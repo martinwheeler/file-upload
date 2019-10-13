@@ -66,8 +66,6 @@ class Files extends PureComponent {
     return (
       <Fragment>
         {data.map((file: File) => {
-          console.warn("FILES: ", file);
-
           const isImage = file.name.match(validImageFiles) !== null;
 
           return isImage ? (

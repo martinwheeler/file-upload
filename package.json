@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "parcel src/index.html --open",
     "prebuild": "rm -rf .cache dist",
-    "build": "parcel build src/index.tsx --experimental-scope-hoisting",
+    "build": "parcel build src/index.tsx",
     "test": "jest --watch",
     "test:ci": "jest && codecov",
     "bump": "./support/bump.sh",

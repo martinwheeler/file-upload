@@ -9,7 +9,7 @@
   </a>
 </p>
 
-> Plugins for the Undress Squarespace website
+> A file upload plugin for Squarespace.
 
 ### 🏠 [Homepage](https://undressrunways.com)
 
@@ -23,6 +23,8 @@ yarn install
 
 ## Usage
 
+Make sure to configure your `.env.development` file before starting development.
+
 ```sh
 yarn dev
 ```
@@ -33,20 +35,16 @@ yarn dev
 yarn test
 ```
 
-## Author
+## Builds
 
-👤 **Martin Wheeler &lt;martin@martinwheeler.com.au&gt;**
+```sh
+yarn bump {version}
+```
 
-- Github: [@martinwheeler](https://github.com/martinwheeler)
+#### Environment Variables
+
+When running a production build make sure you have the `.env.production` file configured otherwise it will build without any variables set.
 
 ## 🤝 Contributing
 
 Contributions, issues and feature requests are welcome !<br />Feel free to check [issues page](https://github.com/martinwheeler/undress-plugins/issues).
-
-## Show your support
-
-Give a ⭐️ if this project helped you !
-
----
-
-_This README was generated with ❤️ by [readme-md-generator](https://github.com/kefranabg/readme-md-generator)_

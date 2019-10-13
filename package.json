@@ -1,6 +1,6 @@
 {
   "name": "undress-plugins",
-  "version": "6.0.0",
+  "version": "6.0.1",
   "description": "Plugins for the Undress Squarespace website",
   "main": "src/index.js",
   "repository": "git@github.com:martinwheeler/undress-plugins.git",

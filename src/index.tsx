@@ -1,6 +1,5 @@
 /* tslint:disable */
 import "@babel/polyfill";
-import "./utils/bugsnag.ts";
 
 import React from "react";
 import { render } from "react-dom";

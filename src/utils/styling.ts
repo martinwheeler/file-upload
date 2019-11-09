@@ -7,7 +7,11 @@
  * @param {*} id
  */
 function injectStyleSheet(id = "formUploaderStyles") {
+  console.warn("INJECTING STYLES");
+
   const headElement = window.top.document.getElementsByTagName("head")[0];
+
+  console.warn("HEAD: ", headElement);
   if (!headElement || headElement.querySelector(`#${id}`)) {
     return false;
   }
@@ -73,6 +77,8 @@ function injectStyleSheet(id = "formUploaderStyles") {
     }
   `;
   newStyleSheet.id = id;
+
+  console.warn("STYLES: ", newStyleSheet);
 
   headElement.appendChild(newStyleSheet);
   return true;

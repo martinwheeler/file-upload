@@ -1,6 +1,6 @@
 import "./fake-squarespace";
 
-import { injectStyleSheet, getFormElements, checkForms } from "./styling";
+import { getFormElements, checkForms } from "./styling";
 
 describe("undress plugins", () => {
   describe("checkForms", () => {
@@ -15,24 +15,6 @@ describe("undress plugins", () => {
       const expected = 1;
 
       expect(actual).toEqual(expected);
-    });
-  });
-
-  describe("injectStyleSheet", () => {
-    it("should inject a style element", () => {
-      const actual = injectStyleSheet(
-        "https://cdn.jsdelivr.net/gh/martinwheeler/undress-plugins@latest/styles.css",
-        "testStylesheet"
-      );
-      expect(actual).toBeTruthy();
-    });
-
-    it("should not inject a style element with the same id more than once", () => {
-      const actual = injectStyleSheet(
-        "https://cdn.jsdelivr.net/gh/martinwheeler/undress-plugins@latest/styles.css",
-        "testStylesheet"
-      );
-      expect(actual).toBeFalsy();
     });
   });
 

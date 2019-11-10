@@ -1,9 +1,11 @@
 import React from "react";
 import { render } from "react-dom";
+
 import { injectStyleSheet } from "./utils/styling";
 import { getDialogType, DIALOG_TYPE } from "./utils/squarespace";
-import Uploads from "./components/uploads";
 import { bugsnagClient } from "./utils/bugsnag";
+
+import Uploads from "./components/uploads";
 
 export const UPLOAD_FIELD_CONFIG = {
   icon: "file",
@@ -110,10 +112,14 @@ function uploadDialogInit(element) {
       if (e.name === "uploads") {
         const pageUrl = dialog.params.initialData.fullUrl.replace(/^\//, "");
         setTimeout(() => {
-          render(
-            <Uploads pageUrl={pageUrl} />,
-            window.top.document.querySelector("#uploadApp")
-          );
+          if (Uploads) {
+            render(
+              <Uploads pageUrl={pageUrl} />,
+              window.top.document.querySelector("#uploadApp")
+            );
+          } else {
+            console.warn("Should render Upload dialog content");
+          }
         });
       }
     });

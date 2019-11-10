@@ -39,7 +39,6 @@ try {
   );
 
   let domObserver = null;
-  let hasBeenInitialised = false;
   let FormUploaderModule = null;
   let hasInitOtherTabListener = null;
   let hasCreatedAdminDialog = false;
@@ -295,7 +294,7 @@ try {
       /**
        * Checks to see if we are in editing mode and adds the correct upload fields.
        */
-      if (currentWindow !== topWindow) {
+      if (currentWindow !== topWindow || developmentGlobals.adminArea) {
         let AdminUploadField = {
           initDialog: () => {
             if (
@@ -316,19 +315,6 @@ try {
         console.warn("ADMIN UPLOAD: ", AdminUploadField);
 
         AdminUploadField.initDialog();
-      }
-
-      if (!hasBeenInitialised) {
-        hasBeenInitialised = true;
-
-        const forms = checkForms(getFormElements());
-        if (forms.length) {
-          checkFormUploaderModule().then(FormUploader => {
-            forms.forEach(form =>
-              form.forEach(fileInput => new FormUploader(fileInput))
-            );
-          });
-        }
       }
     });
 } catch (error) {

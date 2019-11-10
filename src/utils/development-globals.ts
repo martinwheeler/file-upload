@@ -1,25 +1,15 @@
 const config = JSON.parse(localStorage.getItem("sqs-file-uploader")) || {};
 
-window.top.toggleAutoReload = () => {
+/**
+ * Toggles a flag that will be stored in LocalStorage. The flags are used within the plugin code to
+ * enable or disable some features.
+ *
+ * Flags available are: debugMode, invalidBrowser, autoReload, adminArea
+ */
+window.top.toggleFlag = (flagName: string) => {
   localStorage.setItem(
     "sqs-file-uploader",
-    JSON.stringify({ ...config, autoReload: !config.autoReload })
-  );
-  window.top.location.reload(true); // Force refresh
-};
-
-window.top.toggleInvalidBrowser = () => {
-  localStorage.setItem(
-    "sqs-file-uploader",
-    JSON.stringify({ ...config, invalidBrowser: !config.invalidBrowser })
-  );
-  window.top.location.reload(true); // Force refresh
-};
-
-window.top.toggleDebugMode = () => {
-  localStorage.setItem(
-    "sqs-file-uploader",
-    JSON.stringify({ ...config, debugMode: !config.debugMode })
+    JSON.stringify({ ...config, [flagName]: !config[flagName] })
   );
   window.top.location.reload(true); // Force refresh
 };

@@ -139,7 +139,21 @@ if (testEnv) {
     })
   };
 } else {
-  window.Y = {};
+  // Override the self property so it does not equal top
+  Object.defineProperty(window, "self", {
+    value: false
+  });
+
+  window.Y = {
+    Global: {
+      after: (eventName, callback) => {
+        callback();
+      },
+      before: (eventName, callback) => {
+        callback();
+      }
+    }
+  };
   window.Squarespace = {
     initSubs: [],
 

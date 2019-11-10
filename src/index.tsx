@@ -316,6 +316,8 @@ try {
           bugsnagClient.notify(error);
         }
 
+        console.warn("ADMIN UPLOAD: ", AdminUploadField);
+
         AdminUploadField.initDialog();
       }
 

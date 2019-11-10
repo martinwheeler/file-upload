@@ -59,6 +59,17 @@ try {
     return FormUploaderModule.default;
   };
 
+  const modifyUploadFields = () => {
+    const forms = checkForms(getFormElements());
+    if (forms.length) {
+      checkFormUploaderModule().then(FormUploader => {
+        forms.forEach(form =>
+          form.forEach(fileInput => new FormUploader(fileInput))
+        );
+      });
+    }
+  };
+
   const detectShowingOriginalTab = (
     newDialogRoot,
     bodyContainerNode,
@@ -133,14 +144,7 @@ try {
                 const hasForm = !!mutation.target.querySelector("form");
 
                 if (hasForm) {
-                  const forms = checkForms(getFormElements());
-                  if (forms.length) {
-                    checkFormUploaderModule().then(FormUploader => {
-                      forms.forEach(form =>
-                        form.forEach(fileInput => new FormUploader(fileInput))
-                      );
-                    });
-                  }
+                  modifyUploadFields();
                 }
 
                 const closingAdminDialog =
@@ -288,6 +292,8 @@ try {
             childList: true,
             subtree: true
           });
+
+          modifyUploadFields(); // Modify upload fields on first initialisation/page load
         }
       }
 

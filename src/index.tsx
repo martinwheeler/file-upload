@@ -295,10 +295,7 @@ try {
       /**
        * Checks to see if we are in editing mode and adds the correct upload fields.
        */
-      if (
-        currentWindow !== topWindow &&
-        topWindow.document.querySelector("html.squarespace-damask")
-      ) {
+      if (currentWindow !== topWindow) {
         let AdminUploadField = {
           initDialog: () => {
             if (

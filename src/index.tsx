@@ -21,22 +21,16 @@ declare global {
 
 declare const process: any;
 
-const {
-  Squarespace,
-  self: currentWindow,
-  top: topWindow,
-  MutationObserver,
-  Y,
-} = window;
+const { self: currentWindow, top: topWindow, MutationObserver } = window;
 const validBrowser = !!MutationObserver;
 
 try {
-  invariant(
-    !Boolean(window.Squarespace) ||
-      process.env.NODE_ENV === "test" ||
-      process.env.NODE_ENV === "development",
-    "🛑 You are not allowed to run this script anywhere other than Squarespace."
-  );
+  // invariant(
+  //   !Boolean(window.Squarespace) ||
+  //     process.env.NODE_ENV === "test" ||
+  //     process.env.NODE_ENV === "development",
+  //   "🛑 You are not allowed to run this script anywhere other than Squarespace."
+  // );
 
   let domObserver: MutationObserver | null = null;
   let FormUploaderModule: {
@@ -103,8 +97,8 @@ try {
    * 4. Modify the upload fields after initialisation
    * 5. Modify the admin dialog after initialisation
    */
-  Squarespace &&
-    Squarespace.onInitialize(Y, async () => {
+  window.Squarespace &&
+    window.Squarespace.onInitialize(window.Y, async () => {
       console.warn(`🚀 INITIALISING FORM UPLOADER: v${version}`);
 
       if (!validBrowser || developmentGlobals.invalidBrowser) {

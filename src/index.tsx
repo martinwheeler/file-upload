@@ -31,12 +31,12 @@ const {
 const validBrowser = !!MutationObserver;
 
 try {
-  // invariant(
-  //   !Boolean(window.Squarespace) ||
-  //     process.env.NODE_ENV === "test" ||
-  //     process.env.NODE_ENV === "development",
-  //   "🛑 You are not allowed to run this script anywhere other than Squarespace."
-  // );
+  invariant(
+    !Boolean(window.Squarespace) ||
+      process.env.NODE_ENV === "test" ||
+      process.env.NODE_ENV === "development",
+    "🛑 You are not allowed to run this script anywhere other than Squarespace."
+  );
 
   let domObserver: MutationObserver | null = null;
   let FormUploaderModule: {

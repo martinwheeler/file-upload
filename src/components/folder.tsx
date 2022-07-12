@@ -1,15 +1,15 @@
-import React, { Component, Fragment } from "react";
+import { Component } from "react";
 import { css } from "glamor";
 
 const shadowFrames = css.keyframes("shadowFrames", {
   "0%": {
     transform: "translateZ(0) translateX(0) translateY(0)",
-    boxShadow: "0 0 0 0 transparent"
+    boxShadow: "0 0 0 0 transparent",
   },
   "100%": {
     transform: "translateZ(50px) translateX(12px) translateY(-12px)",
-    boxShadow: "-12px 12px 20px -12px rgba(0, 0, 0, .35)"
-  }
+    boxShadow: "-12px 12px 20px -12px rgba(0, 0, 0, .35)",
+  },
 });
 
 const folderStyles = css({
@@ -31,9 +31,9 @@ const folderStyles = css({
       overflow: "initial",
       backgroundColor: "white",
       width: "auto",
-      zIndex: "1"
-    }
-  }
+      zIndex: "1",
+    },
+  },
 });
 
 const labelStyles = css({
@@ -46,7 +46,7 @@ const labelStyles = css({
   textOverflow: "ellipsis",
   overflow: "hidden",
   fontSize: "12px",
-  textAlign: "center"
+  textAlign: "center",
 });
 
 class Folder extends Component {

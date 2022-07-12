@@ -1,19 +1,28 @@
-import SAU from "../vendor/simple-ajax-uploader";
+import SAU, { SimpleUpload } from "../vendor/simple-ajax-uploader";
 import { injectStyleSheet } from "./utils/styling";
 import { USER_ID } from "./utils/squarespace";
 import validatorjs from "validatorjs";
 import get from "lodash/get";
+import { StringObject } from "types/StringObject";
 
 const UPLOAD_URL = `${process.env.API_BASE_URL}/v2/upload`;
 
 class FormUploader {
-  constructor(fileInput) {
+  fileInput: HTMLInputElement;
+  hasShownError: boolean;
+  requirements: { field: string; message: string };
+  currentUploader: SimpleUpload | undefined;
+  folderName: string;
+  pagePath: any;
+  folderBaseName: string;
+
+  constructor(fileInput: HTMLInputElement) {
     injectStyleSheet();
 
     this.hasShownError = false;
     this.requirements = {
       field: "Label name",
-      message: "Please enter your label name before uploading your collection."
+      message: "Please enter your label name before uploading your collection.",
     };
     this.fileInput = fileInput;
 
@@ -21,16 +30,17 @@ class FormUploader {
     this.handleValidation = this.handleValidation.bind(this);
     this.resetErrorStyles = this.resetErrorStyles.bind(this);
 
-    this.currentUploader = this.buildUploader(fileInput);
+    this.currentUploader = this.buildUploader();
     this.folderName = "";
-    this.pagePath = (process.env.NODE_ENV === "test"
-      ? "/my-upload-page"
-      : get(window, "top.location.pathname")
+    this.pagePath = (
+      process.env.NODE_ENV === "test"
+        ? "/my-upload-page"
+        : get(window, "top.location.pathname")
     ).replace(/^\//, "");
     this.folderBaseName = `${USER_ID}/${this.pagePath}`;
   }
 
-  resetErrorStyles({ inputNode, parentNode, hasAddedParentClass }) {
+  resetErrorStyles({ inputNode, parentNode, hasAddedParentClass }: any) {
     const currentClasses = inputNode.className;
     inputNode.className = currentClasses.replace(" field-validation-error", "");
     if (hasAddedParentClass) {
@@ -42,18 +52,18 @@ class FormUploader {
     }
   }
 
-  handleValidation(event) {
+  handleValidation(event: any) {
     const { requirements } = this;
 
     const labels = Array.prototype.slice.call(
       document.querySelectorAll("form label")
     );
 
-    const data = {};
-    const rules = {};
-    const fields = {};
+    const data: StringObject = {};
+    const rules: StringObject = {};
+    const fields: StringObject = {};
 
-    labels.forEach(label => {
+    labels.forEach((label) => {
       const currentLabelText = label.innerHTML
         .replace(/\<.*\>/, "")
         .trim()
@@ -62,7 +72,8 @@ class FormUploader {
       if (currentLabelText === requirements.field.toLowerCase()) {
         const currentFor = label.getAttribute("for");
         const inputId = `#${currentFor}`;
-        const input = !!currentFor && document.querySelector(inputId);
+        const input =
+          !!currentFor && (document.querySelector(inputId) as HTMLInputElement);
         const validationKey = currentLabelText.replace(/\s/g, "_");
 
         if (!!input) {
@@ -72,7 +83,7 @@ class FormUploader {
           fields[validationKey] = {
             forAttribute: currentFor,
             inputId,
-            inputField: input
+            inputField: input,
           };
         }
       }
@@ -82,9 +93,9 @@ class FormUploader {
 
     if (!validator.passes()) {
       const errors = validator.errors.all();
-      let currentForm = null;
+      let currentForm: HTMLFormElement;
 
-      Object.keys(errors).forEach(error => {
+      Object.keys(errors).forEach((error) => {
         const parentNode = fields[error].inputField.parentNode;
         const inputNode = fields[error].inputField;
         let hasAddedParentClass = false;
@@ -108,7 +119,7 @@ class FormUploader {
             this.resetErrorStyles({
               inputNode,
               parentNode,
-              hasAddedParentClass
+              hasAddedParentClass,
             })
           );
           inputNode.className += " field-validation-error";
@@ -119,14 +130,14 @@ class FormUploader {
       event.preventDefault();
 
       // Scroll up the form so users can see validation errors
-      currentForm &&
-        currentForm &&
-        currentForm.scrollIntoView &&
+      // @ts-ignore
+      if (currentForm && currentForm.scrollIntoView) {
         currentForm.scrollIntoView({
           behavior: "smooth",
           block: "start",
-          inline: "nearest"
+          inline: "nearest",
         });
+      }
 
       return;
     }
@@ -147,7 +158,8 @@ class FormUploader {
       return;
     }
 
-    let textInput = fileInput.querySelector(".field-element");
+    let textInput: HTMLInputElement | null =
+      fileInput.querySelector(".field-element");
 
     if (!textInput) {
       error.message = "Invalid Text Input Field";
@@ -162,18 +174,23 @@ class FormUploader {
       ".jpeg",
       ".png",
       ".gif",
-      ".txt"
+      ".txt",
     ];
 
     // Get description
-    const descriptionElement = fileInput.querySelector(".description");
-    const descriptionValue =
-      descriptionElement && descriptionElement.textContent.replace(/\s/g, "");
+    const descriptionElement: HTMLElement | null =
+      fileInput.querySelector(".description");
+    const descriptionValue = descriptionElement!.textContent!.replace(
+      /\s/g,
+      ""
+    );
 
     const fileInputId = fileInput.getAttribute("id");
 
     if (fileInput.querySelector(".description")) {
-      fileInput.querySelector(".description").style.display = "none";
+      (fileInput!.querySelector(
+        ".description"
+      ) as HTMLElement)!.style!.display = "none";
     }
 
     if (textInput) {
@@ -200,7 +217,7 @@ class FormUploader {
       ButtonLabel: "Add_Your_Files",
       RequiredField: "Label_Name",
       RequiredFieldMessage:
-        "Enter_the_name_of_your_Label_before_uploading_your_Collection."
+        "Enter_the_name_of_your_Label_before_uploading_your_Collection.",
     };
 
     const configOptions = descriptionValue
@@ -212,7 +229,7 @@ class FormUploader {
         return {
           ...result,
           [keyValuePair[0]]:
-            (keyValuePair[1] && keyValuePair[1].replace(/_/g, " ")) || true
+            (keyValuePair[1] && keyValuePair[1].replace(/_/g, " ")) || true,
         };
       }, defaultConfigOptions);
 
@@ -221,12 +238,12 @@ class FormUploader {
       Multiple: isMultiple,
       MaxSize: maxSize,
       RequiredField: requiredField,
-      RequiredFieldMessage: requiredMessage
+      RequiredFieldMessage: requiredMessage,
     } = configOptions;
 
     this.requirements = {
       field: requiredField.replace(/_/g, " "),
-      message: requiredMessage.replace(/_/g, " ")
+      message: requiredMessage.replace(/_/g, " "),
     };
 
     const fileInputNode = fileInput.querySelector(".fileInput");
@@ -259,7 +276,7 @@ class FormUploader {
      */
     const extraFormData = new Proxy(
       {
-        folder: null
+        folder: null,
       },
       {
         get: (value, key) => {
@@ -268,7 +285,7 @@ class FormUploader {
             return `${this.folderBaseName}/${this.folderName || "default"}`;
           }
           return Reflect.get(value, key);
-        }
+        },
       }
     );
 
@@ -293,7 +310,7 @@ class FormUploader {
      */
     const uploader = new SAU.SimpleUpload({
       customHeaders: {
-        "User-Id": USER_ID
+        "User-Id": USER_ID,
       },
       id: fileInputId,
       accept: allowedExtensions.toString(),
@@ -307,7 +324,7 @@ class FormUploader {
       data: extraFormData,
       sessionProgressUrl: uploadProgressUrl,
       responseType: "json",
-      allowedExtensions: allowedExtensions.map(allowedExtension => {
+      allowedExtensions: allowedExtensions.map((allowedExtension) => {
         return allowedExtension.replace(/\./g, "").replace(/\s/g, "");
       }),
       maxSize: +maxSize, // kilobytes
@@ -316,24 +333,33 @@ class FormUploader {
       disabledClass: "ui-state-disabled",
       onChange: () => {
         fileInput.querySelector(".field-error") &&
-          fileInput.removeChild(fileInput.querySelector(".field-error"));
+          fileInput.removeChild(
+            fileInput.querySelector(".field-error") as Node
+          );
       },
-      onExtError: (fileName, ext) => {
+      onExtError: (fileName: any, ext: any) => {
         const errorMessage = `Your file ${fileName} is ${ext} type. We accept only these files ${allowedExtensions}`;
 
         errorBox.innerHTML = errorMessage;
         fileInput.insertBefore(errorBox, fileInput.querySelector(".title"));
       },
-      onSizeError: (fileName, fileSize) => {
+      onSizeError: (fileName: any, fileSize: any) => {
         const errorMessage = `Your file ${fileName} is to large! You need to compress the image or resize it, so it's smaller.`;
         fileInput.insertBefore(errorBox, fileInput.querySelector(".title"));
       },
-      onBlankSubmit: function(event) {
+      onBlankSubmit: function (event: any) {
         console.warn("EMPTY SUBMIT: ", event);
       },
-      onSubmit: function(fileName, extension, i, fileSize) {
+      onSubmit: function (
+        fileName: any,
+        extension: any,
+        i: any,
+        fileSize: any
+      ) {
         fileInput.querySelector(".field-error") &&
-          fileInput.removeChild(fileInput.querySelector(".field-error"));
+          fileInput.removeChild(
+            fileInput.querySelector(".field-error") as Node
+          );
 
         let progress = document.createElement("div");
         progress.className = "progress";
@@ -362,7 +388,7 @@ class FormUploader {
           const wrappers = Array.prototype.slice.call(
             fileInput.querySelectorAll(".wrapper")
           );
-          wrappers.forEach(function(wrap) {
+          wrappers.forEach(function (wrap) {
             wrap.parentNode.removeChild(wrap);
           });
         }
@@ -370,7 +396,7 @@ class FormUploader {
         this && this.setProgressBar && this.setProgressBar(bar);
         this && this.setProgressContainer && this.setProgressContainer(wrapper);
       },
-      onComplete: function(fileName, response) {
+      onComplete: function (fileName, response) {
         if (!response) {
           errorBox.textContent = `${fileName} upload failed`;
           fileInput.insertBefore(errorBox, fileInput.querySelector(".title"));
@@ -389,7 +415,7 @@ class FormUploader {
             messageBox.appendChild(success);
           }
         }
-      }
+      },
     });
 
     const uploadInput = document.querySelector("input[type=file][name=file]");

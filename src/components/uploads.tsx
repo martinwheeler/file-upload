@@ -1,32 +1,32 @@
-import React, { Component, Fragment } from "react";
-import JSZip from "jszip";
+import { Component, Fragment } from "react";
+// import JSZip from "jszip";
 import { css } from "glamor";
 import get from "lodash/get";
 import set from "lodash/set";
-import { saveAs } from "file-saver";
+// import { saveAs } from "file-saver";
 
 import Files from "~/components/files";
 import Folder from "~/components/folder";
 
-import { USER_ID } from "~utils/squarespace";
-import { toBinary, toDataURL } from "~utils/upload";
-import developmentGlobals from "~utils/development-globals";
+import { USER_ID } from "~/utils/squarespace";
+import { toBinary, toDataURL } from "~/utils/upload";
+import developmentGlobals from "~/utils/development-globals";
 
 const { Static } = window;
 
 const wrapper = {
-  padding: "22px 0"
+  padding: "22px 0",
 };
 
 const fileContainer = {
   marginTop: "11px",
   padding: "20px",
-  backgroundColor: "white"
+  backgroundColor: "white",
 };
 
 const errorStyles = {
   color: "red",
-  fontWeight: 500
+  fontWeight: 500,
 };
 
 const retryButton = {
@@ -34,25 +34,25 @@ const retryButton = {
   boxShadow: "0 0 5px 0.1px rgba(0, 0, 0, 0.1)",
   padding: "0 5px",
   borderRadius: "3px",
-  cursor: "pointer"
+  cursor: "pointer",
 };
 
 const folderInfo = {
   display: "flex",
   alignItems: "center",
-  marginBottom: "22px"
+  marginBottom: "22px",
 };
 
 const folderBreadcrumbs = {
   marginLeft: "10px",
   fontFamily: "monospace",
   background: "wheat",
-  padding: "5px 10px"
+  padding: "5px 10px",
 };
 
 const folderContainer = css({
   display: "flex",
-  flexWrap: "wrap"
+  flexWrap: "wrap",
 });
 
 const backStyles = css({
@@ -61,36 +61,36 @@ const backStyles = css({
     "> rect": {
       width: "0",
       transition: "all .2s cubic-bezier(.4,0,.68,.06)",
-      transform: "translate(0)"
+      transform: "translate(0)",
     },
 
     "> path": {
       transition: "all .2s cubic-bezier(.4,0,.68,.06)",
-      transform: "translate(0)"
+      transform: "translate(0)",
     },
 
     "&:hover": {
       "> rect": {
         width: "15px",
         transition: "all .2s cubic-bezier(.32,.94,.6,1)",
-        transform: "translate(-6px)"
+        transform: "translate(-6px)",
       },
       "> path": {
         transition: "all .2s cubic-bezier(.32,.94,.6,1)",
-        transform: "translate(-6px)"
-      }
+        transform: "translate(-6px)",
+      },
     },
 
     "> *": {
-      fill: "#313131"
-    }
-  }
+      fill: "#313131",
+    },
+  },
 });
 
 const disabledBackStyles = css({
   filter: "grayscale(100%)",
   cursor: "default",
-  pointerEvents: "none"
+  pointerEvents: "none",
 });
 
 const downloadStyles = css({
@@ -100,11 +100,11 @@ const downloadStyles = css({
   background:
     "url(https://cdn.jsdelivr.net/gh/martinwheeler/undress-plugins@latest/src/download.svg) no-repeat",
   width: "24px",
-  height: "24px"
+  height: "24px",
 });
 
 const oldDialogHeading = css({
-  fontWeight: 500
+  fontWeight: 500,
 });
 
 const newDialogHeading = css({
@@ -112,7 +112,7 @@ const newDialogHeading = css({
   color: "#313131",
   fontSize: "22px",
   marginBottom: "22px",
-  fontWeight: "500"
+  fontWeight: "500",
 });
 
 const getBreadcrumb = ({ path, baseName }) =>
@@ -125,7 +125,7 @@ interface File {
 const validImageFiles = /\.(gif|jpe?g|tiff|png)$/i;
 
 const getFiles = (files: Array<File>) =>
-  files.map(file => {
+  files.map((file) => {
     const isImage = file.name.match(validImageFiles) !== null;
     if (isImage) {
       return toDataURL(file);
@@ -141,7 +141,7 @@ interface Props {
 class Uploads extends Component<Props> {
   static defaultProps: Props = {
     pageUrl: "join-the-team",
-    newDialog: false
+    newDialog: false,
   };
 
   folderBaseName: string = "";
@@ -150,7 +150,7 @@ class Uploads extends Component<Props> {
     error: null,
     folderBreadcrumb: "",
     openFolder: "",
-    folders: []
+    folders: [],
   };
 
   zipFile = new JSZip();
@@ -167,9 +167,9 @@ class Uploads extends Component<Props> {
         : "Sorry, we need you to enter a URL Slug under the Basic tab before Uploads will work correctly.",
       folderBreadcrumb: getBreadcrumb({
         path: `${this.folderBaseName}.${props.pageUrl}`,
-        baseName: this.folderBaseName
+        baseName: this.folderBaseName,
       }),
-      openFolder: `${this.folderBaseName}.${props.pageUrl}`
+      openFolder: `${this.folderBaseName}.${props.pageUrl}`,
     };
 
     this.handleBack = this.handleBack.bind(this);
@@ -221,12 +221,12 @@ class Uploads extends Component<Props> {
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
-            "User-Id": USER_ID
+            "User-Id": USER_ID,
           },
           body: JSON.stringify({
-            folder: `${this.folderBaseName}`
-          })
-        }).then(response => response.json());
+            folder: `${this.folderBaseName}`,
+          }),
+        }).then((response) => response.json());
 
         const newFolderLayout = response.files.reduce(
           (result, nextResource) => {
@@ -246,7 +246,7 @@ class Uploads extends Component<Props> {
             const currentData = get(result, `${folderPath}.data`) || [];
 
             set(result, folderPath, {
-              data: [...currentData, { ...nextResource, ourType: "file" }]
+              data: [...currentData, { ...nextResource, ourType: "file" }],
             });
 
             return result;
@@ -258,7 +258,7 @@ class Uploads extends Component<Props> {
 
         this.setState({
           loading: false,
-          folders: newFolderLayout
+          folders: newFolderLayout,
           // openFolder: !!possibleFolderData ? openFolder : this.folderBaseName,
           // folderBreadcrumb: getBreadcrumb({
           //   path: `${this.folderBaseName}.${pageUrl}`,
@@ -302,7 +302,7 @@ class Uploads extends Component<Props> {
 
     this.setState({
       openFolder: path,
-      folderBreadcrumb: getBreadcrumb({ path, baseName: this.folderBaseName })
+      folderBreadcrumb: getBreadcrumb({ path, baseName: this.folderBaseName }),
     });
   }
 
@@ -337,7 +337,7 @@ class Uploads extends Component<Props> {
         // WE HAVE SOME FILES
         if (fileKey === "data") {
           downloadedFiles.push(
-            Promise.all(getFiles(data[fileKey])).then(readyToZipFiles => {
+            Promise.all(getFiles(data[fileKey])).then((readyToZipFiles) => {
               readyToZipFiles.forEach((file, index) => {
                 const fileData = data[fileKey][index];
                 const folderPaths = new RegExp(/.*\//, "gi");
@@ -351,13 +351,13 @@ class Uploads extends Component<Props> {
                   console.warn({
                     file,
                     fileData,
-                    fileWithExtension
+                    fileWithExtension,
                   });
                 }
 
                 zipFile.file(fileWithExtension, file, {
                   base64: isImage,
-                  binary: !isImage
+                  binary: !isImage,
                 });
               });
             })
@@ -381,13 +381,8 @@ class Uploads extends Component<Props> {
   }
 
   render() {
-    const {
-      loading,
-      error,
-      openFolder,
-      folderBreadcrumb,
-      folders
-    } = this.state;
+    const { loading, error, openFolder, folderBreadcrumb, folders } =
+      this.state;
     const { newDialog } = this.props;
 
     return (
@@ -411,8 +406,9 @@ class Uploads extends Component<Props> {
             <Fragment>
               <div style={folderInfo}>
                 <div
-                  className={`${backStyles} ${!openFolder &&
-                    disabledBackStyles}`}
+                  className={`${backStyles} ${
+                    !openFolder && disabledBackStyles
+                  }`}
                   onClick={this.handleBack}
                 >
                   <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
@@ -466,7 +462,7 @@ class Uploads extends Component<Props> {
 
     return (
       <Fragment>
-        {Object.keys(folderData).map(path => {
+        {Object.keys(folderData).map((path) => {
           const currentResources = folderData[path];
           // Render files
           if (path === "data") {

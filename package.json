@@ -19,7 +19,7 @@
   "dependencies": {
     "@babel/core": "^7.6.4",
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
-    "@babel/polyfill": "^7.6.0",
+    "@babel/polyfill": "^7.12.1",
     "@babel/preset-env": "^7.6.3",
     "@babel/preset-react": "^7.6.3",
     "@bugsnag/js": "^6.4.2",
@@ -32,11 +32,12 @@
     "jest": "^24.8.0",
     "jszip": "^3.2.2",
     "jszip-utils": "^0.1.0",
+    "lodash": "^4.17.21",
     "node-fetch": "^2.6.0",
     "parcel-plugin-bundle-visualiser": "^1.2.0",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
-    "validatorjs": "^3.15.1"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "validatorjs": "^3.22.1"
   },
   "jest": {
     "coverageDirectory": "./coverage/",
@@ -51,6 +52,12 @@
     "clearMocks": true
   },
   "devDependencies": {
+    "@types/invariant": "^2.2.35",
+    "@types/lodash": "^4.14.182",
+    "@types/node": "^18.0.3",
+    "@types/react": "^18.0.15",
+    "@types/react-dom": "^18.0.6",
+    "@types/validatorjs": "^3.15.0",
     "codecov": "^3.5.0",
     "dotenv": "^8.0.0",
     "parcel": "^1.12.4",

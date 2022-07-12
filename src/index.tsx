@@ -1,32 +1,32 @@
-/* tslint:disable */
 import "@babel/polyfill";
 
-import React from "react";
-import { render } from "react-dom";
 import invariant from "invariant";
 
-import { getFormElements, checkForms } from "./utils/styling";
+// import { allHTMLFormElements, getFormsWithUploadInputs } from "~/utils/styling";
 import { version } from "../package.json";
-import { bugsnagClient } from "./utils/bugsnag";
+// import { bugsnagClient } from "~/utils/bugsnag";
 
-import developmentGlobals from "./utils/development-globals";
-import get from "lodash/get";
+import developmentGlobals from "~/utils/development-globals";
+import { Y } from "~/types/global/Y";
+import { Squarespace } from "~/types/global/Squarespace";
+import { createUploadElement, findMenuElement } from "~/utils/admin";
+import { toArray } from "lodash";
 
 declare global {
   interface Window {
-    Squarespace: any;
-    MutationObserver: any;
+    Squarespace: Squarespace;
+    Y: Y;
   }
 }
 
 declare const process: any;
-declare const Y: any;
 
 const {
   Squarespace,
   self: currentWindow,
   top: topWindow,
-  MutationObserver
+  MutationObserver,
+  Y,
 } = window;
 const validBrowser = !!MutationObserver;
 
@@ -38,77 +38,83 @@ try {
     "🛑 You are not allowed to run this script anywhere other than Squarespace."
   );
 
-  let domObserver = null;
-  let FormUploaderModule = null;
-  let hasInitOtherTabListener = null;
+  let domObserver: MutationObserver | null = null;
+  let FormUploaderModule: {
+    default: any;
+  } | null = null;
+  let hasInitOtherTabListener: boolean | null = null;
   let hasCreatedAdminDialog = false;
-  let resetAdminDialog = null;
+  let resetAdminDialog: (() => void) | null = null;
 
-  const checkFormUploaderModule = async () => {
-    try {
-      if (!FormUploaderModule) {
-        FormUploaderModule = await import("./form-uploader");
-      }
-    } catch (error) {
-      bugsnagClient.notify(error);
-      if (process.env.NODE_ENV !== "test" && developmentGlobals.autoReload) {
-        topWindow.location.reload(true);
-      }
-    }
+  // const checkFormUploaderModule = async () => {
+  //   try {
+  //     if (!FormUploaderModule) {
+  //       FormUploaderModule = await import("./form-uploader");
+  //       return FormUploaderModule.default;
+  //     }
+  //   } catch (error) {
+  //     bugsnagClient.notify(error);
+  //     if (process.env.NODE_ENV !== "test" && developmentGlobals.autoReload) {
+  //       topWindow!.location.reload();
+  //     }
+  //   }
+  // };
 
-    return FormUploaderModule.default;
-  };
+  // /**
+  //  * Handles updating any form input which has the required attributes to be a file upload input.
+  //  */
+  // const modifyUploadFields = () => {
+  //   const forms = getFormsWithUploadInputs(allHTMLFormElements());
+  //   if (forms.length) {
+  //     checkFormUploaderModule().then((FormUploader) => {
+  //       forms.forEach((form: any) =>
+  //         form.forEach(
+  //           (fileUploadInput: any) => new FormUploader(fileUploadInput)
+  //         )
+  //       );
+  //     });
+  //   }
+  // };
 
-  const modifyUploadFields = () => {
-    const forms = checkForms(getFormElements());
-    if (forms.length) {
-      checkFormUploaderModule().then(FormUploader => {
-        forms.forEach(form =>
-          form.forEach(fileInput => new FormUploader(fileInput))
-        );
-      });
-    }
-  };
+  const addAdminDialog = (container: Node) => {
+    // const startElement = contains("p", "Page Settings");
 
-  const detectShowingOriginalTab = (
-    newDialogRoot,
-    bodyContainerNode,
-    uploadLabelNode
-  ) => event => {
-    hasInitOtherTabListener = true;
-    if (!newDialogRoot.contains(event.target)) {
-      // TODO: Check if the user has clicked a different link in the nav
-      const isAnotherTab = Array.prototype.slice
-        .call(event.target.classList)
-        .some(
-          className =>
-            className.includes("NavItem-container-") ||
-            className.includes("NavText-container-") ||
-            className.includes("NavText-subtitle-") ||
-            className.includes("Text-container-") ||
-            className.includes("Text-subtitle-")
-        );
-
-      if (isAnotherTab) {
-        // TODO: Remove active style to upload label
-        uploadLabelNode.classList.remove("is-active");
-        bodyContainerNode.style.display = "flex";
-        newDialogRoot.style.display = "none";
+    /**
+     * New upload admin dialog hijacking
+     */
+    if (container && !hasCreatedAdminDialog) {
+      const menuElement = findMenuElement(container as HTMLElement);
+      if (menuElement) {
+        createUploadElement(menuElement);
       }
     }
   };
 
+  const removeAdminDialog = (container: Node) => {};
+
+  /**
+   * 1. Checks if we are running on a valid browser, which has a MutationObserver defined & we don't have the debug variable set to true
+   *   a. Get the browser name using bowser & send a slack notification
+   * 2. Create a new MutationObserver and make sure when the dom changes that we are still showing the upload fields & admin form changes
+   *   a. Look for any form elements & then modify them using modifyUploadFields()
+   *   b. Handle removing the admin dialog changes from the page & any event listeners
+   *   c. Handles adding a new upload section to the admin dialog
+   * 3. Attach the dom observer to the top window
+   * 4. Modify the upload fields after initialisation
+   * 5. Modify the admin dialog after initialisation
+   */
   Squarespace &&
     Squarespace.onInitialize(Y, async () => {
       console.warn(`🚀 INITIALISING FORM UPLOADER: v${version}`);
 
       if (!validBrowser || developmentGlobals.invalidBrowser) {
-        // TODO: Lazy load Bowser + notify util
-        const BowserUtil = import("bowser").then(Imported => {
+        import("bowser").then((Imported) => {
           const Bowser = Imported.default;
-          const browserDetails = Bowser.parse(topWindow.navigator.userAgent);
+          const browserDetails = Bowser.parse(
+            topWindow!.navigator?.userAgent || ""
+          );
           const shortBrowserDetails = `${browserDetails.os.name}: ${browserDetails.browser.name} - ${browserDetails.browser.version}`;
-          const currentUrl = topWindow.location.href;
+          const currentUrl = topWindow!.location.href;
 
           const invalidBrowserMessage = {
             username: "File Uploader",
@@ -121,11 +127,11 @@ try {
                   {
                     title: "Browser",
                     value: JSON.stringify(browserDetails, null, 2),
-                    short: false
-                  }
-                ]
-              }
-            ]
+                    short: false,
+                  },
+                ],
+              },
+            ],
           };
 
           import("./utils/slack").then(({ notify }) => {
@@ -138,191 +144,83 @@ try {
            * Creates a DOM mutation observer to run check forms encase a new
            * upload field has been created by the user.
            */
-          domObserver = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
+          domObserver = new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
               if (mutation.type === "childList") {
-                const hasForm = !!mutation.target.querySelector("form");
+                const addedNodes = toArray(mutation.addedNodes);
+                const removedNodes = toArray(mutation.removedNodes);
 
-                if (hasForm) {
-                  modifyUploadFields();
-                }
+                if (addedNodes.length) {
+                  // TODO: Add the DOM changes
+                  const adminModalContainer = addedNodes.find((node: any) => {
+                    return node?.innerText?.includes("Page Settings");
+                  });
 
-                const closingAdminDialog =
-                  Array.prototype.slice
-                    .call(get(mutation, "previousSibling.classList") || [])
-                    .some(className => className.includes("CCModalPortal")) &&
-                  hasCreatedAdminDialog;
-
-                if (closingAdminDialog) {
-                  resetAdminDialog();
-                }
-
-                const hasAdminDialog =
-                  (mutation.addedNodes[0] &&
-                    mutation.addedNodes[0].dataset &&
-                    mutation.addedNodes[0].dataset.modalId) ||
-                  Array.prototype.slice
-                    .call(mutation.target.classList)
-                    .some(className => className.includes("Body-container-"));
-
-                if (hasAdminDialog && !hasCreatedAdminDialog) {
-                  hasCreatedAdminDialog = true;
-                  const navDialogContainer = topWindow.document.querySelector(
-                    "div[class*='NavDialog-container-']"
-                  );
-                  const navMenuElement = topWindow.document.querySelector(
-                    "div[class^='NavMenu-container']"
-                  );
-                  const bodyContainer = navDialogContainer.querySelector(
-                    "div[class^='Body-container-']"
-                  );
-                  const closeButton = navDialogContainer.querySelector(
-                    "button"
-                  );
-
-                  if (developmentGlobals.debugMode) {
-                    console.warn("PAGE ELEMENTS: ", {
-                      navDialogContainer,
-                      navMenuElement,
-                      bodyContainer,
-                      closeButton
-                    });
+                  if (adminModalContainer) {
+                    console.debug("📝 Admin modal found - adding");
+                    addAdminDialog(adminModalContainer);
                   }
-
-                  const newDialogRoot = topWindow.document.createElement("div");
-                  newDialogRoot.setAttribute("id", "newUploadDialogApp");
-                  newDialogRoot.style.position = "relative";
-                  newDialogRoot.style.flex = "1";
-                  newDialogRoot.style.display = "block";
-                  newDialogRoot.style.padding = "85px 33px 55px 55px";
-
-                  let unSubHandler = null;
-
-                  topWindow.showNewUploadSection = element => {
-                    const pageUrl = topWindow.document.querySelector(
-                      'input[title="URL Slug"]'
-                    ).value;
-                    const possibleDialogRoot = topWindow.document.querySelector(
-                      "#newUploadDialogApp"
-                    );
-
-                    element.classList.add("is-active");
-
-                    bodyContainer.style.display = "none";
-                    if (!possibleDialogRoot) {
-                      navDialogContainer.appendChild(newDialogRoot);
-
-                      // TODO: Lazy load the upload component
-                      const UploadsComponent = import(
-                        "./components/uploads"
-                      ).then(Component => {
-                        const Uploads = Component.default;
-                        render(
-                          <Uploads newDialog pageUrl={pageUrl} />,
-                          topWindow.document.querySelector(
-                            "#newUploadDialogApp"
-                          )
-                        );
-                      });
-
-                      // NOTE: Make sure we show old body when user navigates away from uploads section
-                    } else {
-                      // Reshow the body element
-                      possibleDialogRoot.style.display = "block";
-                    }
-
-                    if (!hasInitOtherTabListener) {
-                      const handler = detectShowingOriginalTab(
-                        newDialogRoot,
-                        bodyContainer,
-                        element
-                      );
-
-                      topWindow.document.body.addEventListener(
-                        "click",
-                        handler
-                      );
-
-                      unSubHandler = () => {
-                        topWindow.document.body.removeEventListener(
-                          "click",
-                          handler
-                        );
-                      };
-                    }
-
-                    /**
-                     * Remove the isActive class from any other nav labels, as we are showing it on
-                     * the Uploads label now.
-                     */
-                    topWindow.document
-                      .querySelectorAll("div[class^=NavTextMarker-bar-]")
-                      .forEach(element => {
-                        element.classList.forEach(className => {
-                          if (className.includes("isActive")) {
-                            element.classList.remove(className);
-                          }
-                        });
-                      });
-                  };
-
-                  const newNavItem = topWindow.document.createElement("div");
-                  newNavItem.setAttribute("id", "dialogUploadApp");
-                  newNavItem.innerHTML =
-                    "<span class='new-form-upload-label' onclick='window.top.showNewUploadSection(this)'>Uploads</span>";
-                  navMenuElement.appendChild(newNavItem);
-
-                  resetAdminDialog = () => {
-                    newNavItem.remove();
-                    newDialogRoot.remove();
-                    if (unSubHandler) {
-                      unSubHandler();
-                    }
-                    hasInitOtherTabListener = false;
-                    hasCreatedAdminDialog = false;
-                  };
-                  closeButton.addEventListener("click", resetAdminDialog);
                 }
+
+                if (removedNodes.length) {
+                  // TODO: Remove the DOM changes
+                  const adminModalContainer = removedNodes.find((node: any) => {
+                    return node?.innerText?.includes("Page Settings");
+                  });
+
+                  if (adminModalContainer) {
+                    console.debug("📝 Admin modal found - removing");
+                    removeAdminDialog(adminModalContainer);
+                  }
+                }
+
+                // const hasForm = !!(
+                //   mutation.target as HTMLElement
+                // ).querySelector("form");
+
+                // if (hasForm) {
+                //   modifyUploadFields();
+                // }
               }
             });
           });
 
-          domObserver.observe(topWindow.document, {
+          domObserver.observe(topWindow!.document, {
             attributes: true,
             childList: true,
-            subtree: true
+            subtree: true,
           });
 
-          modifyUploadFields(); // Modify upload fields on first initialisation/page load
+          // modifyUploadFields(); // Modify upload fields on first initialisation/page load
         }
       }
 
       /**
        * Checks to see if we are in editing mode and adds the correct upload fields.
        */
-      if (currentWindow !== topWindow || developmentGlobals.adminArea) {
-        let AdminUploadField = {
-          initDialog: () => {
-            if (
-              process.env.NODE_ENV !== "test" &&
-              developmentGlobals.autoReload
-            ) {
-              topWindow.location.reload(true);
-            }
-          }
-        };
+      // if (currentWindow !== topWindow || developmentGlobals.adminArea) {
+      //   let AdminUploadField = {
+      //     initDialog: () => {
+      //       if (
+      //         process.env.NODE_ENV !== "test" &&
+      //         developmentGlobals.autoReload
+      //       ) {
+      //         topWindow!.location.reload();
+      //       }
+      //     },
+      //   };
 
-        try {
-          AdminUploadField = await import("./admin-upload-field");
-        } catch (error) {
-          bugsnagClient.notify(error);
-        }
+      //   try {
+      //     AdminUploadField = await import("./admin-upload-field");
+      //   } catch (error) {
+      //     bugsnagClient.notify(error);
+      //   }
 
-        console.warn("ADMIN UPLOAD: ", AdminUploadField);
+      //   console.warn("ADMIN UPLOAD: ", AdminUploadField);
 
-        AdminUploadField.initDialog();
-      }
+      //   AdminUploadField.initDialog();
+      // }
     });
 } catch (error) {
-  bugsnagClient.notify(error);
+  console.error(error);
 }

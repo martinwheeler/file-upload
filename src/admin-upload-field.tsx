@@ -1,4 +1,3 @@
-import React from "react";
 import { render } from "react-dom";
 
 import { injectStyleSheet } from "./utils/styling";
@@ -18,8 +17,8 @@ export const UPLOAD_FIELD_CONFIG = {
     title: "Upload Files",
     id: null,
     required: false,
-    textarea: true
-  }
+    textarea: true,
+  },
 };
 
 /**
@@ -61,11 +60,11 @@ function dialogInit(element) {
       // Shows the field when editing the form fields
       if (currentDialog === DIALOG_TYPE.EDIT) {
         const fields = dialog.getField("fields");
-        fields.after("dataChange", function() {
+        fields.after("dataChange", function () {
           fields
             .get("contentBox")
             .all(".sqs-form-builder-field")
-            .each(function(field) {
+            .each(function (field) {
               if (
                 field.one('textarea[placeholder="Description"]') &&
                 field
@@ -99,16 +98,16 @@ function uploadDialogInit(element) {
         component: () => <span id="uploadApp" />,
         props: {
           getData: () => ({
-            isDirty: false
-          })
-        }
+            isDirty: false,
+          }),
+        },
       },
       tabFields: [],
-      tabPanelObj: {}
+      tabPanelObj: {},
     });
 
     // Render after upload tab is chosen
-    Y.Global.after("EditingDialog:tab-shown", e => {
+    Y.Global.after("EditingDialog:tab-shown", (e) => {
       if (e.name === "uploads") {
         const pageUrl = dialog.params.initialData.fullUrl.replace(/^\//, "");
         setTimeout(() => {

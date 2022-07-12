@@ -84,14 +84,14 @@ function injectStyleSheet(id = "formUploaderStyles") {
   return true;
 }
 
-function getFormElements() {
+function allHTMLFormElements(): HTMLFormElement[] {
   return Array.prototype.slice.call(document.querySelectorAll("form"));
 }
 
-function getFileUploadInputs(form) {
+function findFileUploadInputs(form: HTMLFormElement) {
   return Array.prototype.slice
     .call(form.querySelectorAll(".form-item"))
-    .filter(inputField => {
+    .filter((inputField) => {
       const description = inputField.querySelector(".description");
       return description && description.textContent.includes("FileField");
     });
@@ -102,20 +102,20 @@ function getFileUploadInputs(form) {
  *
  * @param {*} forms
  */
-function checkForms(forms) {
+function getFormsWithUploadInputs(forms: HTMLFormElement[]) {
   if (!forms || !forms.length) {
     return [];
   }
 
   return forms
-    .map(form => {
-      const availableFileInputs = getFileUploadInputs(form);
-      if (availableFileInputs.length) {
-        return availableFileInputs;
+    .map((form) => {
+      const availableFileUploadInputs = findFileUploadInputs(form);
+      if (availableFileUploadInputs.length) {
+        return availableFileUploadInputs;
       }
       return undefined;
     })
     .filter(Boolean);
 }
 
-export { injectStyleSheet, getFormElements, getFileUploadInputs, checkForms };
+export { injectStyleSheet, allHTMLFormElements, getFormsWithUploadInputs };

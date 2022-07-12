@@ -1,6 +1,6 @@
-function notify(message) {
+function notify(message: string | any) {
   let payload = {
-    text: message
+    text: message,
   };
 
   if (typeof message === "object") {
@@ -16,7 +16,7 @@ function notify(message) {
     cache: "no-cache",
     credentials: "same-origin",
     referrer: "no-referrer",
-    body: JSON.stringify(payload)
+    body: JSON.stringify(payload),
   });
 }
 

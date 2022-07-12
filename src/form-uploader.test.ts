@@ -1,12 +1,12 @@
 import "./utils/fake-squarespace";
 import FormUploader from "./form-uploader";
-import { checkForms, getFormElements } from "./utils/styling";
+import { getFormsWithUploadInputs, allHTMLFormElements } from "./utils/styling";
 
 let Uploaders = [];
-const forms = checkForms(getFormElements());
+const forms = getFormsWithUploadInputs(allHTMLFormElements());
 if (forms.length) {
-  forms.forEach(form =>
-    form.forEach(fileInput => {
+  forms.forEach((form) =>
+    form.forEach((fileInput) => {
       Uploaders.push(new FormUploader(fileInput));
     })
   );
@@ -34,7 +34,7 @@ describe("FormUploader", () => {
 
     MultipleUploader.handleValidation({
       stopPropagation: jest.fn,
-      preventDefault: jest.fn
+      preventDefault: jest.fn,
     });
 
     expect(MultipleUploader.currentUploader._opts.data.folder).toEqual(
@@ -50,7 +50,7 @@ describe("FormUploader", () => {
     it("should pass validation", () => {
       const fakeEvent = {
         stopPropagation: jest.fn(),
-        preventDefault: jest.fn()
+        preventDefault: jest.fn(),
       };
       MultipleUploader.handleValidation(fakeEvent);
     });
@@ -71,20 +71,20 @@ describe("FormUploader", () => {
 
       MultipleUploader.resetErrorStyles({
         inputNode: {
-          className: ""
+          className: "",
         },
         parentNode: false,
-        hasAddedParentClass: false
+        hasAddedParentClass: false,
       });
 
       MultipleUploader.resetErrorStyles({
         inputNode: {
-          className: ""
+          className: "",
         },
         parentNode: {
-          className: ""
+          className: "",
         },
-        hasAddedParentClass: true
+        hasAddedParentClass: true,
       });
     });
   });
@@ -125,12 +125,12 @@ describe("FormUploader", () => {
       MultipleUploader.currentUploader._opts.onComplete("file", {
         bytes: 25,
         type: "upload",
-        signature: "signature_here"
+        signature: "signature_here",
       });
       MultipleUploader.currentUploader._opts.onComplete("file", {
         bytes: 0,
         type: "upload",
-        signature: "signature_here"
+        signature: "signature_here",
       });
     });
 

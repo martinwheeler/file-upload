@@ -1,9 +1,9 @@
-import React, { PureComponent, Fragment } from "react";
+import { PureComponent, Fragment } from "react";
 import { css } from "glamor";
 
 const imageStyle = {
   marginRight: "10px",
-  marginBottom: "10px"
+  marginBottom: "10px",
 };
 
 const otherFile = css({
@@ -24,9 +24,9 @@ const otherFile = css({
       backgroundColor: "white",
       width: "auto",
       zIndex: "1",
-      boxShadow: "0 4px 2px rgba(0,0,0,0.5)"
-    }
-  }
+      boxShadow: "0 4px 2px rgba(0,0,0,0.5)",
+    },
+  },
 });
 
 const labelStyles = css({
@@ -39,7 +39,7 @@ const labelStyles = css({
   textOverflow: "ellipsis",
   overflow: "hidden",
   fontSize: "12px",
-  textAlign: "center"
+  textAlign: "center",
 });
 
 const validImageFiles = /\.(gif|jpe?g|tiff|png)$/i;

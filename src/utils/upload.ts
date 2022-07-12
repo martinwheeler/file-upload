@@ -1,3 +1,4 @@
+// TODO: Replace with a typed lib
 import JSZipUtils from "jszip-utils";
 
 interface File {
@@ -17,9 +18,9 @@ const toBinary = ({ metadata: { mediaLink } }) => {
 
 const toDataURL = ({ metadata: { mediaLink } }) => {
   return fetch(mediaLink)
-    .then(response => response.blob())
+    .then((response) => response.blob())
     .then(
-      blob =>
+      (blob) =>
         new Promise((resolve, reject) => {
           const reader = new FileReader();
           reader.onloadend = () => resolve(reader.result);

@@ -9,7 +9,7 @@ import { version } from "../package.json";
 import developmentGlobals from "~/utils/development-globals";
 import { Y } from "~/types/global/Y";
 import { Squarespace } from "~/types/global/Squarespace";
-import { createUploadElement, findMenuElement } from "~/utils/admin";
+import { contains, createUploadElement, findMenuElement } from "~/utils/admin";
 import { toArray } from "lodash";
 
 declare global {
@@ -79,13 +79,13 @@ try {
   // };
 
   const addAdminDialog = (container: Node) => {
-    // const startElement = contains("p", "Page Settings");
+    const startElement = contains("p", "Page Settings");
 
     /**
      * New upload admin dialog hijacking
      */
-    if (container && !hasCreatedAdminDialog) {
-      const menuElement = findMenuElement(container as HTMLElement);
+    if (startElement && !hasCreatedAdminDialog) {
+      const menuElement = findMenuElement(startElement as HTMLElement);
       if (menuElement) {
         createUploadElement(menuElement);
       }

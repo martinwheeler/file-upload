@@ -1,4 +1,4 @@
-function contains(selector: string, text: string) {
+function contains(document: Document, selector: string, text: string) {
   var elements = document.querySelectorAll(selector);
   return Array.prototype.filter.call(elements, function (element) {
     return RegExp(text).test(element.textContent);
@@ -51,7 +51,7 @@ function findMenuElement(startElement: HTMLElement) {
 }
 
 function showUploadContent(event: MouseEvent) {
-  console.log("SHOW UPLOAD CONTENT");
+  console.debug("👉 SHOW UPLOAD CONTENT");
 
   // TODO: Find admin dialog right panel
   // TODO: Inject the upload react component there

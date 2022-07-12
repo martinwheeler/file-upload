@@ -79,7 +79,7 @@ try {
   // };
 
   const addAdminDialog = (container: Node) => {
-    const startElement = contains("p", "Page Settings");
+    const startElement = contains(topWindow!.document, "p", "Page Settings");
 
     /**
      * New upload admin dialog hijacking
@@ -158,7 +158,7 @@ try {
 
               if (adminModalContainer) {
                 console.debug("📝 Admin modal found - adding");
-                addAdminDialog(adminModalContainer);
+                setTimeout(() => addAdminDialog(adminModalContainer), 0);
               }
             }
 

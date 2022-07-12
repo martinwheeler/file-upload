@@ -68,7 +68,7 @@ function showUploadContent(event: MouseEvent) {
 }
 
 function createUploadElement(menuElement: HTMLElement) {
-  const menuEntryElement = menuElement.querySelector("a");
+  const menuEntryElement = menuElement.querySelectorAll("a")[1];
   const uploadMenuEntryElement = menuEntryElement?.cloneNode(
     true
   ) as HTMLElement;

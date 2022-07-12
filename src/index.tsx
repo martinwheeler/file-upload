@@ -21,16 +21,20 @@ declare global {
 
 declare const process: any;
 
-const { self: currentWindow, top: topWindow, MutationObserver } = window;
+const {
+  Squarespace,
+  self: currentWindow,
+  top: topWindow,
+  MutationObserver,
+  Y,
+} = window;
 const validBrowser = !!MutationObserver;
 
 try {
-  // invariant(
-  //   !Boolean(window.Squarespace) ||
-  //     process.env.NODE_ENV === "test" ||
-  //     process.env.NODE_ENV === "development",
-  //   "🛑 You are not allowed to run this script anywhere other than Squarespace."
-  // );
+  invariant(
+    Boolean(Squarespace) && process.env.NODE_ENV === "production",
+    "🛑 You are not allowed to run this script anywhere other than Squarespace."
+  );
 
   let domObserver: MutationObserver | null = null;
   let FormUploaderModule: {
@@ -97,124 +101,124 @@ try {
    * 4. Modify the upload fields after initialisation
    * 5. Modify the admin dialog after initialisation
    */
-  // window.Squarespace &&
-  //   window.Squarespace.onInitialize(window.Y, async () => {
-  console.warn(`🚀 INITIALISING FORM UPLOADER: v${version}`);
+  Squarespace &&
+    Squarespace.onInitialize(Y, async () => {
+      console.warn(`🚀 INITIALISING FORM UPLOADER: v${version}`);
 
-  if (!validBrowser || developmentGlobals.invalidBrowser) {
-    import("bowser").then((Imported) => {
-      const Bowser = Imported.default;
-      const browserDetails = Bowser.parse(
-        topWindow!.navigator?.userAgent || ""
-      );
-      const shortBrowserDetails = `${browserDetails.os.name}: ${browserDetails.browser.name} - ${browserDetails.browser.version}`;
-      const currentUrl = topWindow!.location.href;
+      if (!validBrowser || developmentGlobals.invalidBrowser) {
+        import("bowser").then((Imported) => {
+          const Bowser = Imported.default;
+          const browserDetails = Bowser.parse(
+            topWindow!.navigator?.userAgent || ""
+          );
+          const shortBrowserDetails = `${browserDetails.os.name}: ${browserDetails.browser.name} - ${browserDetails.browser.version}`;
+          const currentUrl = topWindow!.location.href;
 
-      const invalidBrowserMessage = {
-        username: "File Uploader",
-        attachments: [
-          {
-            fallback: `An invalid browser version has been used! They won't be able to see the upload input on new DOM nodes. On: ${shortBrowserDetails}`,
-            pretext: `An invalid browser has been detected! ${currentUrl}`,
-            color: "#D00000",
-            fields: [
+          const invalidBrowserMessage = {
+            username: "File Uploader",
+            attachments: [
               {
-                title: "Browser",
-                value: JSON.stringify(browserDetails, null, 2),
-                short: false,
+                fallback: `An invalid browser version has been used! They won't be able to see the upload input on new DOM nodes. On: ${shortBrowserDetails}`,
+                pretext: `An invalid browser has been detected! ${currentUrl}`,
+                color: "#D00000",
+                fields: [
+                  {
+                    title: "Browser",
+                    value: JSON.stringify(browserDetails, null, 2),
+                    short: false,
+                  },
+                ],
               },
             ],
-          },
-        ],
-      };
+          };
 
-      import("./utils/slack").then(({ notify }) => {
-        notify(invalidBrowserMessage);
-      });
-    });
-  } else {
-    if (!domObserver) {
-      /**
-       * Creates a DOM mutation observer to run check forms encase a new
-       * upload field has been created by the user.
-       */
-      domObserver = new MutationObserver(function (mutations) {
-        mutations.forEach(function (mutation) {
-          if (mutation.type === "childList") {
-            const addedNodes = toArray(mutation.addedNodes);
-            const removedNodes = toArray(mutation.removedNodes);
-
-            if (addedNodes.length) {
-              // TODO: Add the DOM changes
-              const adminModalContainer = addedNodes.find((node: any) => {
-                return node?.innerText?.includes("Page Settings");
-              });
-
-              if (adminModalContainer) {
-                console.debug("📝 Admin modal found - adding");
-                addAdminDialog(adminModalContainer);
-              }
-            }
-
-            if (removedNodes.length) {
-              // TODO: Remove the DOM changes
-              const adminModalContainer = removedNodes.find((node: any) => {
-                return node?.innerText?.includes("Page Settings");
-              });
-
-              if (adminModalContainer) {
-                console.debug("📝 Admin modal found - removing");
-                removeAdminDialog(adminModalContainer);
-              }
-            }
-
-            // const hasForm = !!(
-            //   mutation.target as HTMLElement
-            // ).querySelector("form");
-
-            // if (hasForm) {
-            //   modifyUploadFields();
-            // }
-          }
+          import("./utils/slack").then(({ notify }) => {
+            notify(invalidBrowserMessage);
+          });
         });
-      });
+      } else {
+        if (!domObserver) {
+          /**
+           * Creates a DOM mutation observer to run check forms encase a new
+           * upload field has been created by the user.
+           */
+          domObserver = new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+              if (mutation.type === "childList") {
+                const addedNodes = toArray(mutation.addedNodes);
+                const removedNodes = toArray(mutation.removedNodes);
 
-      domObserver.observe(topWindow!.document, {
-        attributes: true,
-        childList: true,
-        subtree: true,
-      });
+                if (addedNodes.length) {
+                  // TODO: Add the DOM changes
+                  const adminModalContainer = addedNodes.find((node: any) => {
+                    return node?.innerText?.includes("Page Settings");
+                  });
 
-      // modifyUploadFields(); // Modify upload fields on first initialisation/page load
-    }
-  }
+                  if (adminModalContainer) {
+                    console.debug("📝 Admin modal found - adding");
+                    addAdminDialog(adminModalContainer);
+                  }
+                }
 
-  /**
-   * Checks to see if we are in editing mode and adds the correct upload fields.
-   */
-  // if (currentWindow !== topWindow || developmentGlobals.adminArea) {
-  //   let AdminUploadField = {
-  //     initDialog: () => {
-  //       if (
-  //         process.env.NODE_ENV !== "test" &&
-  //         developmentGlobals.autoReload
-  //       ) {
-  //         topWindow!.location.reload();
-  //       }
-  //     },
-  //   };
+                if (removedNodes.length) {
+                  // TODO: Remove the DOM changes
+                  const adminModalContainer = removedNodes.find((node: any) => {
+                    return node?.innerText?.includes("Page Settings");
+                  });
 
-  //   try {
-  //     AdminUploadField = await import("./admin-upload-field");
-  //   } catch (error) {
-  //     bugsnagClient.notify(error);
-  //   }
+                  if (adminModalContainer) {
+                    console.debug("📝 Admin modal found - removing");
+                    removeAdminDialog(adminModalContainer);
+                  }
+                }
 
-  //   console.warn("ADMIN UPLOAD: ", AdminUploadField);
+                // const hasForm = !!(
+                //   mutation.target as HTMLElement
+                // ).querySelector("form");
 
-  //   AdminUploadField.initDialog();
-  // }
-  // });
+                // if (hasForm) {
+                //   modifyUploadFields();
+                // }
+              }
+            });
+          });
+
+          domObserver.observe(topWindow!.document, {
+            attributes: true,
+            childList: true,
+            subtree: true,
+          });
+
+          // modifyUploadFields(); // Modify upload fields on first initialisation/page load
+        }
+      }
+
+      /**
+       * Checks to see if we are in editing mode and adds the correct upload fields.
+       */
+      // if (currentWindow !== topWindow || developmentGlobals.adminArea) {
+      //   let AdminUploadField = {
+      //     initDialog: () => {
+      //       if (
+      //         process.env.NODE_ENV !== "test" &&
+      //         developmentGlobals.autoReload
+      //       ) {
+      //         topWindow!.location.reload();
+      //       }
+      //     },
+      //   };
+
+      //   try {
+      //     AdminUploadField = await import("./admin-upload-field");
+      //   } catch (error) {
+      //     bugsnagClient.notify(error);
+      //   }
+
+      //   console.warn("ADMIN UPLOAD: ", AdminUploadField);
+
+      //   AdminUploadField.initDialog();
+      // }
+    });
 } catch (error) {
   console.error(error);
 }

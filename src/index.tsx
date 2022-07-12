@@ -32,7 +32,7 @@ const validBrowser = !!MutationObserver;
 
 try {
   invariant(
-    !!Squarespace ||
+    !Boolean(window.Squarespace) ||
       process.env.NODE_ENV === "test" ||
       process.env.NODE_ENV === "development",
     "🛑 You are not allowed to run this script anywhere other than Squarespace."

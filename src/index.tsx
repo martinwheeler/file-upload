@@ -31,7 +31,10 @@ const {
 const validBrowser = !!MutationObserver;
 
 try {
-  console.log(Boolean(Squarespace), process.env.NODE_ENV === "production");
+  console.log(
+    Boolean(window.Squarespace),
+    process.env.NODE_ENV === "production"
+  );
   // invariant(
   //   Boolean(Squarespace) && process.env.NODE_ENV === "production",
   //   "🛑 You are not allowed to run this script anywhere other than Squarespace."
@@ -102,8 +105,8 @@ try {
    * 4. Modify the upload fields after initialisation
    * 5. Modify the admin dialog after initialisation
    */
-  Squarespace &&
-    Squarespace.onInitialize(Y, async () => {
+  window.Squarespace &&
+    window.Squarespace.onInitialize(window.Y, async () => {
       console.warn(`🚀 INITIALISING FORM UPLOADER: v${version}`);
 
       if (!validBrowser || developmentGlobals.invalidBrowser) {
